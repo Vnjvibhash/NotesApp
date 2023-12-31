@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, ScrollView, FlatList } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { FlashList } from '@shopify/flash-list'
@@ -7,40 +7,56 @@ import { firebase } from '../config'
 export default function Home() {
     const [notes, setNotes] = useState([]);
     const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        firebase.firestore()
-            .collection('notes')
-            .onSnapshot((querySnapshot) => {
-                const newNotes = [];
-                querySnapshot.forEach((doc) => {
-                    const { note, title } = doc.data()
-                    newNotes.push({
-                        id: doc.id,
-                        note,
-                        title
-                    })
-                });
-                setNotes(newNotes);
-            })
+        getData()
     });
+
+    getData = async () => {
+        const snapshot = await firebase.firestore().collection('notes').get();
+        const notes = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        setIsLoading(false)
+        setNotes(notes);
+    }
     return (
         <View style={styles.container}>
-            <FlashList
-                data={notes}
-                numColumns={2}
-                estimatedItemSize={100}
-                renderItem={({ item }) => (
-                    <View style={styles.noteView}>
-                        <Text style={styles.noteTitle}>
-                            {item.title}
-                        </Text>
-                        <Text style={styles.noteDesc}>
-                            {item.note}
-                        </Text>
-                    </View>
-                )}
-            />
+            {isLoading ? (<ActivityIndicator size="large" color="#00ff00" />) : (
+                <FlashList
+                    data={notes}
+                    numColumns={2}
+                    estimatedItemSize={100}
+                    renderItem={({ item }) => (
+                        <View style={styles.noteView}>
+                            <Text style={styles.noteTitle}>
+                                {item.title}
+                            </Text>
+                            <Text style={styles.noteDesc}>
+                                {item.note}
+                            </Text>
+                        </View>
+                    )}
+                />
+                // <FlatList
+                //     numColumns={2}
+                //     showsVerticalScrollIndicator={false}
+                //     showsHorizontalScrollIndicator={false}
+                //     data={notes}
+                //     renderItem={({ item, index }) => {
+                //         <View style={styles.noteView}>
+                //             <Text style={styles.noteTitle}>
+                //                 {item.title}
+                //             </Text>
+                //             <Text style={styles.noteDesc}>
+                //                 {item.note}
+                //             </Text>
+                //         </View>
+                //     }}
+                // />
+            )}
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => navigation.navigate('AddNote')}
@@ -56,13 +72,16 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 12,
         backgroundColor: '#ffe9ce',
+        alignContent: 'center',
+        justifyContent: 'center',
     },
     noteView: {
         padding: 8,
         backgroundColor: '#ffc8dd',
         borderRadius: 12,
         margin: 4,
-        height: 150,
+        flex: 1,
+        alignItems: 'center',
     },
     noteTitle: {
         fontWeight: 'bold',

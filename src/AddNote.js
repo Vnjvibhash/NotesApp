@@ -1,25 +1,21 @@
-import { StyleSheet, Text, View, TouchableOpacity, Keyboard, TextInput } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Keyboard, TextInput, ToastAndroid } from 'react-native'
 import React, { useState } from 'react'
 import { firebase } from '../config'
 
 export default AddNote = () => {
     const [title, setTitle] = useState('')
     const [note, setNote] = useState('')
-    const addNote = () => {
-        firebase.firestore()
-            .collection('notes')
-            .add({
-                title,
-                note
-            })
-            .then(() => {
-                setTitle('')
-                setNote('')
-                Keyboard.dismiss();
-            })
-            .catch((error) => {
-                alert(error)
-            });
+    const addNote = async () => {
+        Keyboard.dismiss();
+        await firebase.firestore().collection('notes').add({
+            title: title,
+            note: note,
+        })
+        .then(()=>{
+            ToastAndroid.show('Notes Added Successfully', ToastAndroid.SHORT)
+        });
+        setTitle('')
+        setNote('')
     }
     return (
         <View style={styles.container}>
@@ -37,7 +33,7 @@ export default AddNote = () => {
             />
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('AddNote')}
+                onPress={addNote}
             >
                 <Text style={styles.appButtonText}>Save Notes</Text>
             </TouchableOpacity>
@@ -58,7 +54,8 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#efe9ae',
         borderRadius: 10,
-        borderColor: '#ff9f86'
+        borderColor: '#ff9f86',
+        color: 'black',
     },
     editNote: {
         height: 100,
@@ -67,7 +64,8 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#efe9ae',
         borderRadius: 10,
-        borderColor: '#ff9f86'
+        borderColor: '#ff9f86',
+        color: 'black',
     },
     button: {
         elevation: 8,

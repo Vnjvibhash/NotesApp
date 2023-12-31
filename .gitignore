@@ -66,4 +66,4 @@ yarn-error.log
 /coverage
 
 # firebase configuration file
-config.js
+/config.js
