@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Home from './src/Home';
 import AddNote from './src/AddNote';
 import Header from './src/Header';
+import EditNote from './src/EditNote';
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,17 @@ const App = () => {
           name='AddNote'
           options={{
             headerTitle: () => <Header title='AddNote' />,
+            headerStyle: {
+              backgroundColor: '#ff9f86',
+              height: 64
+            }
+          }}
+        />
+        <Stack.Screen
+          component={EditNote}
+          name='EditNote'
+          options={{
+            headerTitle: () => <Header title='EditNote' />,
             headerStyle: {
               backgroundColor: '#ff9f86',
               height: 64

@@ -1,22 +1,39 @@
 import { StyleSheet, Text, View, TouchableOpacity, Keyboard, TextInput, ToastAndroid } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 
-export default AddNote = () => {
+export default EditNote = (props) => {
     const [title, setTitle] = useState('')
     const [note, setNote] = useState('')
-    const addNote = async () => {
+
+    useEffect(() => {
+        setTitle(props.route.params.item.title)
+        setNote(props.route.params.item.note)
+    });
+
+    const updateNote = async () => {
         Keyboard.dismiss();
-        await firebase.firestore().collection('notes').add({
+        await firebase.firestore().collection('notes').doc(props.route.params.item.id).update({
             title: title,
             note: note,
         })
         .then(()=>{
-            ToastAndroid.show('Notes Added Successfully', ToastAndroid.SHORT)
+            ToastAndroid.show('Notes Updated Successfully', ToastAndroid.SHORT)
         });
         setTitle('')
         setNote('')
     }
+
+    const deleteNote = async () =>{
+        await firebase.firestore().collection('notes').doc(props.route.params.item.id).delete()
+        .then(()=>{
+            ToastAndroid.show('Notes Deleted Successfully', ToastAndroid.SHORT)
+            props.navigation.navigate("Home")
+        });
+        setTitle('')
+        setNote('')
+    }
+
     return (
         <View style={styles.container}>
             <TextInput
@@ -32,10 +49,16 @@ export default AddNote = () => {
                 onChangeText={(text) => setNote(text)}
             />
             <TouchableOpacity
-                style={styles.button}
-                onPress={addNote}
+                style={styles.updateButton}
+                onPress={updateNote}
             >
-                <Text style={styles.appButtonText}>Save Notes</Text>
+                <Text style={styles.appButtonText}>Update Notes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={deleteNote}
+            >
+                <Text style={styles.appButtonText}>Delete Notes</Text>
             </TouchableOpacity>
         </View>
     )
@@ -67,9 +90,18 @@ const styles = StyleSheet.create({
         borderColor: '#ff9f86',
         color: '#000000',
     },
-    button: {
+    updateButton: {
         elevation: 8,
-        marginTop:50,
+        marginTop: 50,
+        marginHorizontal: 12,
+        backgroundColor: "#abde89",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12
+    },
+    deleteButton: {
+        elevation: 8,
+        marginTop: 50,
         marginHorizontal: 12,
         backgroundColor: "#ff9f86",
         borderRadius: 10,

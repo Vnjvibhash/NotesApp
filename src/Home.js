@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, ScrollView, FlatList } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { FlashList } from '@shopify/flash-list'
@@ -31,12 +31,14 @@ export default function Home() {
                     estimatedItemSize={100}
                     renderItem={({ item }) => (
                         <View style={styles.noteView}>
-                            <Text style={styles.noteTitle}>
-                                {item.title}
-                            </Text>
-                            <Text style={styles.noteDesc}>
-                                {item.note}
-                            </Text>
+                            <Pressable onPress={() => navigation.navigate('EditNote', { item })}>
+                                <Text style={styles.noteTitle}>
+                                    {item.title}
+                                </Text>
+                                <Text style={styles.noteDesc}>
+                                    {item.note}
+                                </Text>
+                            </Pressable>
                         </View>
                     )}
                 />
