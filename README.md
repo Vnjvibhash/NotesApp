@@ -25,7 +25,7 @@ To run the Note App on your Android device, follow these steps:
 #### Clone this repository to your local machine.
 
 ```
-  git clone https://github.com/your-username/note-app.git
+  git clone git@github.com:Vnjvibhash/NotesApp.git
 ```
 
 #### Navigate to the project directory.
